@@ -1,12 +1,13 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:app/controllers/auth_controllers.dart';
 import 'package:app/helpers/appcolors.dart';
 import 'package:app/helpers/custom_button.dart';
 import 'package:app/helpers/custom_text.dart';
 import 'package:app/helpers/reusable_textfield.dart';
+import 'package:app/helpers/validator.dart';
 import 'package:app/views/auth/forget_password.dart';
 import 'package:app/views/auth/signup.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -18,11 +19,13 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   late AuthController controller;
+  final GlobalKey<FormState> _loginFormKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
     controller = Get.put(AuthController());
+    controller.isLoading.value = false;
   }
 
   @override
@@ -107,7 +110,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   maxLines: 4,
                                 ),
                                 Form(
-                                  key: controller.loginFormKey,
+                                  key: _loginFormKey,
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
@@ -121,9 +124,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                           Icons.email_outlined,
                                           color: AppColors.primaryColor,
                                         ),
-                                        // validator: (val) =>
-                                        //     AppValidator.validateEmail(
-                                        //         value: val),
+                                        validator: (val) =>
+                                            AppValidator.validateEmail(
+                                                value: val),
                                       ),
                                       Obx(
                                         () => ReUsableTextField(
@@ -147,15 +150,16 @@ class _LoginScreenState extends State<LoginScreen> {
                                               color: AppColors.primaryColor,
                                             ),
                                           ),
-                                          // validator: (val) =>
-                                          //     AppValidator.validateEmptyText(
-                                          //   value: val,
-                                          //   fieldName: 'Password',
-                                          // ),
+                                          validator: (val) =>
+                                              AppValidator.validateEmptyText(
+                                            value: val,
+                                            fieldName: 'Password',
+                                          ),
                                         ),
                                       ),
                                       InkWell(
                                         onTap: () {
+                                          controller.isLoading.value = false;
                                           controller.emailController.clear();
                                           controller.passwordController.clear();
                                           Get.to(
@@ -181,7 +185,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     buttonText: 'Login',
                                     isLoading: controller.isLoading.value,
                                     onTap: () {
-                                      if (controller.loginFormKey.currentState!
+                                      if (_loginFormKey.currentState!
                                           .validate()) {
                                         controller.loginUser();
                                       }
@@ -192,6 +196,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 Center(
                                   child: GestureDetector(
                                     onTap: () {
+                                      controller.isLoading.value = false;
                                       controller.emailController.clear();
                                       controller.passwordController.clear();
                                       Get.to(
@@ -222,21 +227,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                 ),
                                 SizedBox(height: context.height * 0.02),
-                                // InkWell(
-                                //   onTap: () {
-                                //     //   Get.to(
-                                //     //   () => SubscriptionScreen(),
-                                //     //   transition: Transition.size,
-                                //     //   duration: const Duration(seconds: 1),
-                                //     // );
-                                //   },
-                                //   child: CustomTextWidget(
-                                //     text: 'Want to Buy Subscription?',
-                                //     fontSize: 16.0,
-                                //     textAlign: TextAlign.center,
-                                //     fontWeight: FontWeight.w500,
-                                //   ),
-                                // ),
                               ],
                             ),
                           ),

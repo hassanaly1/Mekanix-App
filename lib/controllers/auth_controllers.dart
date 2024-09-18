@@ -1,12 +1,12 @@
-import 'package:app/services/auth_service.dart';
-import 'package:flutter/material.dart';
 import 'package:app/helpers/storage_helper.dart';
 import 'package:app/helpers/toast.dart';
+import 'package:app/services/auth_service.dart';
 import 'package:app/views/auth/change_password.dart';
 import 'package:app/views/auth/login.dart';
 import 'package:app/views/auth/otp.dart';
 import 'package:app/views/auth/verify_email.dart';
 import 'package:app/views/dashboard/dashboard.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class AuthController extends GetxController {
@@ -21,47 +21,41 @@ class AuthController extends GetxController {
   TextEditingController confirmPasswordController = TextEditingController();
   TextEditingController otpController = TextEditingController();
 
-  final GlobalKey<FormState> loginFormKey = GlobalKey<FormState>();
-  final GlobalKey<FormState> signupFormKey = GlobalKey<FormState>();
-  final GlobalKey<FormState> changePasswordFormKey = GlobalKey<FormState>();
-
   final AuthService authService = AuthService();
 
   // RegisterUser
   Future<void> registerUser() async {
-    if (signupFormKey.currentState?.validate() ?? false) {
-      isLoading.value = true;
+    isLoading.value = true;
 
-      // Call the registerUser method in AuthService
-      try {
-        Map<String, dynamic> response = await authService.registerUser(
-            firstName: fNameController.text.trim(),
-            lastName: lNameController.text.trim(),
-            email: emailController.text.trim(),
-            password: passwordController.text.trim(),
-            confirmPassword: confirmPasswordController.text.trim());
+    // Call the registerUser method in AuthService
+    try {
+      Map<String, dynamic> response = await authService.registerUser(
+          firstName: fNameController.text.trim(),
+          lastName: lNameController.text.trim(),
+          email: emailController.text.trim(),
+          password: passwordController.text.trim(),
+          confirmPassword: confirmPasswordController.text.trim());
 
-        if (response['status'] == 'success') {
-          debugPrint('Registration successful');
-          ToastMessage.showToastMessage(
-              message: response['message'], backgroundColor: Colors.green);
-
-          Get.to(() => OtpScreen(
-                verifyOtpForForgetPassword: false,
-                email: emailController.text.trim(),
-              ));
-        } else {
-          ToastMessage.showToastMessage(
-              message: response['message'], backgroundColor: Colors.red);
-        }
-      } catch (e) {
-        debugPrint('An error occurred during registration: $e');
+      if (response['status'] == 'success') {
+        debugPrint('Registration successful');
         ToastMessage.showToastMessage(
-            message: 'An error occurred during registration',
-            backgroundColor: Colors.red);
-      } finally {
-        isLoading.value = false;
+            message: response['message'], backgroundColor: Colors.green);
+
+        Get.to(() => OtpScreen(
+              verifyOtpForForgetPassword: false,
+              email: emailController.text.trim(),
+            ));
+      } else {
+        ToastMessage.showToastMessage(
+            message: response['message'], backgroundColor: Colors.red);
       }
+    } catch (e) {
+      debugPrint('An error occurred during registration: $e');
+      ToastMessage.showToastMessage(
+          message: 'An error occurred during registration',
+          backgroundColor: Colors.red);
+    } finally {
+      isLoading.value = false;
     }
   }
 

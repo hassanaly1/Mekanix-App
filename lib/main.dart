@@ -25,8 +25,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var isFirstTime = storage.read('isFirstTime');
+    if (isFirstTime == null) {
+      storage.write('isFirstTime', true);
+    }
     return GetMaterialApp(
-        title: 'Mechanix',
+        title: 'Mekanix',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
@@ -44,6 +48,7 @@ class AuthCheck extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('IsFirstTime: ${storage.read('isFirstTime')}');
     return FutureBuilder(
       future: authStatusCheckController._initialize(),
       builder: (context, snapshot) {

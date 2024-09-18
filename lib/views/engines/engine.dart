@@ -1,7 +1,5 @@
 import 'dart:io';
 
-import 'package:easy_sidemenu/easy_sidemenu.dart';
-import 'package:flutter/material.dart';
 import 'package:app/controllers/engines_controller.dart';
 import 'package:app/controllers/universal_controller.dart';
 import 'package:app/helpers/appcolors.dart';
@@ -13,6 +11,8 @@ import 'package:app/helpers/tabbar.dart';
 import 'package:app/helpers/validator.dart';
 import 'package:app/models/engine_model.dart';
 import 'package:app/views/task/widgets/heading_and_textfield.dart';
+import 'package:easy_sidemenu/easy_sidemenu.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -178,12 +178,7 @@ class EnginesTabbarView extends StatelessWidget {
                         return CustomEngineCard(
                           controller: controller,
                           model: engine,
-                          onTap: () {
-                            // Get.to(
-                            //         () => EngineDetailScreen(
-                            //         model: engine),
-                            //     transition: Transition.size);
-                          },
+                          onTap: () {},
                         );
                       } else if (controller.isLoading.value) {
                         return const Center(
@@ -495,23 +490,29 @@ class CustomEngineCard extends StatelessWidget {
           //     fontSize: 12.0,
           //     textColor: AppColors.lightGreyColor)
         ]),
-        trailing: Wrap(
-          spacing: 12.0,
-          children: [
-            InkWell(
-                onTap: () {
-                  _showEditPopup(
-                      context: context, controller: controller, model: model);
-                },
-                child: Icon(Icons.edit, color: AppColors.secondaryColor)),
-            InkWell(
-                onTap: () {
-                  _showDeletePopup(
-                      context: context, controller: controller, model: model);
-                },
-                child: const Icon(Icons.delete, color: Colors.red))
-          ],
-        ),
+        trailing: model.isDefault ?? true
+            ? null
+            : Wrap(
+                spacing: 12.0,
+                children: [
+                  InkWell(
+                      onTap: () {
+                        _showEditPopup(
+                            context: context,
+                            controller: controller,
+                            model: model);
+                      },
+                      child: Icon(Icons.edit, color: AppColors.secondaryColor)),
+                  InkWell(
+                      onTap: () {
+                        _showDeletePopup(
+                            context: context,
+                            controller: controller,
+                            model: model);
+                      },
+                      child: const Icon(Icons.delete, color: Colors.red))
+                ],
+              ),
         // trailing: QrImageView(
         //     data: model.name ?? '',
         //     version: QrVersions.auto,

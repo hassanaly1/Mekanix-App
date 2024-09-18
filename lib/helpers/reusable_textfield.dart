@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:app/helpers/appcolors.dart';
 import 'package:app/helpers/reusable_container.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 class ReUsableTextField extends StatelessWidget {
@@ -74,12 +74,12 @@ class ReUsableTextField extends StatelessWidget {
           hintText: hintText,
           hintStyle: TextStyle(
             fontFamily: 'Poppins',
-            fontSize: 10,
+            fontSize: 12,
             fontWeight: FontWeight.w300,
             color: AppColors.lightTextColor,
           ),
           errorStyle: const TextStyle(
-            fontSize: 8.0,
+            fontSize: 10.0,
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w400,
             color: Colors.redAccent,

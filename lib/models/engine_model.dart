@@ -15,6 +15,7 @@ class EngineModel {
   String? subname;
   bool? isGenerator;
   bool? isCompressor;
+  bool? isDefault;
 
   EngineModel({
     this.id,
@@ -24,6 +25,7 @@ class EngineModel {
     this.subname,
     this.isGenerator,
     this.isCompressor,
+    this.isDefault,
   });
 
   factory EngineModel.fromJson(Map<String, dynamic> json) => EngineModel(
@@ -34,6 +36,7 @@ class EngineModel {
         subname: json["subname"],
         isGenerator: json["is_generator"],
         isCompressor: json["is_compressor"],
+        isDefault: json["is_default"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -43,5 +46,6 @@ class EngineModel {
         "subname": subname,
         "is_generator": isGenerator,
         "is_compressor": isCompressor,
+        "is_default": isDefault,
       };
 }

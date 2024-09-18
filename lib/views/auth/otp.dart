@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
 import 'package:app/controllers/auth_controllers.dart';
 import 'package:app/helpers/appcolors.dart';
 import 'package:app/helpers/custom_button.dart';
 import 'package:app/helpers/custom_text.dart';
 import 'package:app/helpers/toast.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pinput/pinput.dart';
 
@@ -32,8 +32,8 @@ class _OtpScreenState extends State<OtpScreen> {
     width: 56,
     height: 60,
     textStyle: const TextStyle(
-      fontFamily: 'Montserrat',
-      fontSize: 22,
+      fontFamily: 'Poppins',
+      fontSize: 20,
       color: Color.fromRGBO(30, 60, 87, 1),
     ),
     decoration: BoxDecoration(
@@ -66,6 +66,7 @@ class _OtpScreenState extends State<OtpScreen> {
   void initState() {
     super.initState();
     startTimer();
+    controller.isLoading.value = false;
   }
 
   @override
@@ -157,7 +158,7 @@ class _OtpScreenState extends State<OtpScreen> {
                                       horizontal: 16.0),
                                   child: Pinput(
                                     length: 6,
-                                    keyboardType: TextInputType.text,
+                                    keyboardType: TextInputType.number,
                                     controller: controller.otpController,
                                     validator: (s) {
                                       return null;

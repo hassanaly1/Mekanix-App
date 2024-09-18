@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:app/controllers/auth_controllers.dart';
 import 'package:app/helpers/appcolors.dart';
 import 'package:app/helpers/custom_button.dart';
@@ -6,12 +5,26 @@ import 'package:app/helpers/custom_text.dart';
 import 'package:app/helpers/reusable_textfield.dart';
 import 'package:app/helpers/toast.dart';
 import 'package:app/helpers/validator.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class VerifyEmailScreen extends StatelessWidget {
-  VerifyEmailScreen({super.key});
+class VerifyEmailScreen extends StatefulWidget {
+  const VerifyEmailScreen({super.key});
 
+  @override
+  State<VerifyEmailScreen> createState() => _VerifyEmailScreenState();
+}
+
+class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
   final AuthController controller = Get.find();
+
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    controller.isLoading.value = false;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -94,6 +107,7 @@ class VerifyEmailScreen extends StatelessWidget {
                                 maxLines: 4,
                               ),
                               Form(
+                                key: _formKey,
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
@@ -118,8 +132,7 @@ class VerifyEmailScreen extends StatelessWidget {
                                   isLoading: controller.isLoading.value,
                                   buttonText: 'Verify Email',
                                   onTap: () {
-                                    if (controller
-                                        .emailController.text.isEmpty) {
+                                    if (_formKey.currentState!.validate()) {
                                       ToastMessage.showToastMessage(
                                           message: 'Please Enter your Email',
                                           backgroundColor: Colors.red);

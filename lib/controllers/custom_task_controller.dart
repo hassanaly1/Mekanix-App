@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:app/helpers/storage_helper.dart';
 import 'package:app/helpers/toast.dart';
 import 'package:app/models/custom_task_model.dart';
 import 'package:app/services/task_service.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class CustomTaskController extends GetxController {
@@ -27,6 +27,10 @@ class CustomTaskController extends GetxController {
   RxString engineBrandId = ''.obs;
   RxString engineBrandName = ''.obs;
 
+  // New variables
+  RxBool hasMoreTasks = true.obs;
+  RxBool hasMoreTemplates = true.obs;
+
   @override
   onInit() {
     reportsScrollController.addListener(() {
@@ -50,66 +54,140 @@ class CustomTaskController extends GetxController {
 
   Future<void> loadNextPageTasks() async {
     debugPrint('Loading Next Page ${currentPageTasks.value} Tasks');
+    if (isTasksAreLoading.value) return;
     isTasksAreLoading.value = true;
 
-    List<MyCustomTask> nextPageTasks = await _taskService.getAllCustomTasks(
-      searchString: '',
-      token: storage.read('token'),
-      page: currentPageTasks.value,
-      isTemplate: false,
-    );
+    try {
+      List<MyCustomTask> nextPageTasks = await _taskService.getAllCustomTasks(
+        searchString: '',
+        token: storage.read('token'),
+        page: currentPageTasks.value,
+        isTemplate: false,
+      );
 
-    Set<String?> existingTasksIds =
-        submittedTasks.map((task) => task.id).toSet();
-    for (var task in nextPageTasks) {
-      if (!existingTasksIds.contains(task.id)) {
-        submittedTasks.add(task);
-        existingTasksIds.add(task.id);
+      Set<String?> existingTasksIds =
+          submittedTasks.map((task) => task.id).toSet();
+      for (var task in nextPageTasks) {
+        if (!existingTasksIds.contains(task.id)) {
+          submittedTasks.add(task);
+          existingTasksIds.add(task.id);
+        }
       }
-    }
 
-    if (nextPageTasks.length >= 10) {
-      currentPageTasks.value++;
+      hasMoreTasks.value = nextPageTasks.length >= 10;
+      if (hasMoreTasks.value) {
+        currentPageTasks.value++;
+      }
+    } catch (e) {
+      debugPrint('Error loading tasks: $e');
+    } finally {
+      isTasksAreLoading.value = false;
     }
-
-    isTasksAreLoading.value = false;
   }
 
   Future<void> loadNextPageTemplates() async {
     debugPrint('Loading Next Page ${currentPageTemplates.value} Templates');
+    if (isTemplatesAreLoading.value) return;
     isTemplatesAreLoading.value = true;
 
-    List<MyCustomTask> nextPageTemplates = await _taskService.getAllCustomTasks(
-      searchString: '',
-      token: storage.read('token'),
-      page: currentPageTemplates.value,
-      isTemplate: true,
-    );
+    try {
+      List<MyCustomTask> nextPageTemplates =
+          await _taskService.getAllCustomTasks(
+        searchString: '',
+        token: storage.read('token'),
+        page: currentPageTemplates.value,
+        isTemplate: true,
+      );
 
-    Set<String?> existingTemplatesIds =
-        templates.map((template) => template.id).toSet();
-    for (var template in nextPageTemplates) {
-      if (!existingTemplatesIds.contains(template.id)) {
-        templates.add(template);
-        existingTemplatesIds.add(template.id);
+      Set<String?> existingTemplatesIds =
+          templates.map((template) => template.id).toSet();
+      for (var template in nextPageTemplates) {
+        if (!existingTemplatesIds.contains(template.id)) {
+          templates.add(template);
+          existingTemplatesIds.add(template.id);
+        }
       }
-    }
 
-    if (nextPageTemplates.length >= 10) {
-      currentPageTemplates.value++;
+      hasMoreTemplates.value = nextPageTemplates.length >= 10;
+      if (hasMoreTemplates.value) {
+        currentPageTemplates.value++;
+      }
+    } catch (e) {
+      debugPrint('Error loading templates: $e');
+    } finally {
+      isTemplatesAreLoading.value = false;
     }
-
-    isTemplatesAreLoading.value = false;
   }
+
+  // Future<void> loadNextPageTasks() async {
+  //   debugPrint('Loading Next Page ${currentPageTasks.value} Tasks');
+  //   isTasksAreLoading.value = true;
+  //
+  //   List<MyCustomTask> nextPageTasks = await _taskService.getAllCustomTasks(
+  //     searchString: '',
+  //     token: storage.read('token'),
+  //     page: currentPageTasks.value,
+  //     isTemplate: false,
+  //   );
+  //
+  //   Set<String?> existingTasksIds =
+  //       submittedTasks.map((task) => task.id).toSet();
+  //   for (var task in nextPageTasks) {
+  //     if (!existingTasksIds.contains(task.id)) {
+  //       submittedTasks.add(task);
+  //       existingTasksIds.add(task.id);
+  //     }
+  //   }
+  //
+  //   if (nextPageTasks.length >= 10) {
+  //     currentPageTasks.value++;
+  //   }
+  //
+  //   isTasksAreLoading.value = false;
+  // }
+  //
+  // Future<void> loadNextPageTemplates() async {
+  //   debugPrint('Loading Next Page ${currentPageTemplates.value} Templates');
+  //   isTemplatesAreLoading.value = true;
+  //
+  //   List<MyCustomTask> nextPageTemplates = await _taskService.getAllCustomTasks(
+  //     searchString: '',
+  //     token: storage.read('token'),
+  //     page: currentPageTemplates.value,
+  //     isTemplate: true,
+  //   );
+  //
+  //   Set<String?> existingTemplatesIds =
+  //       templates.map((template) => template.id).toSet();
+  //   for (var template in nextPageTemplates) {
+  //     if (!existingTemplatesIds.contains(template.id)) {
+  //       templates.add(template);
+  //       existingTemplatesIds.add(template.id);
+  //     }
+  //   }
+  //
+  //   if (nextPageTemplates.length >= 10) {
+  //     currentPageTemplates.value++;
+  //   }
+  //
+  //   isTemplatesAreLoading.value = false;
+  // }
 
   Future<void> getAllCustomTasks(
       {String? searchName, int? page, bool isTemplate = false}) async {
     debugPrint(
         'Page${page ?? currentPage.value} ${isTemplate ? 'Template' : 'Submitted'} tasks called.');
     try {
-      templates.clear();
-      submittedTasks.clear();
-      isLoading.value = true;
+      if (isTemplate) {
+        templates.clear();
+        isTemplatesAreLoading.value = true;
+      } else {
+        submittedTasks.clear();
+        isTasksAreLoading.value = true;
+      }
+      // templates.clear();
+      // submittedTasks.clear();
+      // isLoading.value = true;
       List<MyCustomTask> fetchedTasks = await _taskService.getAllCustomTasks(
         searchString: searchName ?? '',
         token: storage.read('token'),
@@ -128,7 +206,12 @@ class CustomTaskController extends GetxController {
     } catch (e) {
       debugPrint('Error fetching Tasks: $e');
     } finally {
-      isLoading.value = false;
+      if (isTemplate) {
+        isTemplatesAreLoading.value = false;
+      } else {
+        isTasksAreLoading.value = false;
+      }
+      // isLoading.value = false;
     }
   }
 

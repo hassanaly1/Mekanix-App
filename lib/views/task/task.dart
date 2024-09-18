@@ -251,46 +251,43 @@ class TaskListView extends StatelessWidget {
       color: AppColors.primaryColor,
       backgroundColor: AppColors.secondaryColor,
       triggerMode: RefreshIndicatorTriggerMode.onEdge,
-      child: Obx(() {
-        if (controller.isLoading.value) {
-          return Center(
-            child: SpinKitThreeBounce(
-              color: AppColors.blueTextColor,
-              size: 30,
-            ),
-          );
-        } else if (isTemplate
-            ? controller.templates.isEmpty
-            : controller.submittedTasks.isEmpty) {
-          return Center(
-            heightFactor: 10.0,
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  SizedBox(height: context.height * 0.2),
-                  CustomTextWidget(
-                    text: isTemplate
-                        ? 'No Templates Available'
-                        : 'No Submitted Tasks Available',
-                  ),
-                  SizedBox(height: context.height * 0.5),
-                ],
-              ),
-            ),
-          );
-        } else {
+      child: Obx(
+        () {
           final tasks =
               isTemplate ? controller.templates : controller.submittedTasks;
+          final isLoading = isTemplate
+              ? controller.isTemplatesAreLoading.value
+              : controller.isTasksAreLoading.value;
+          final hasMore = isTemplate
+              ? controller.hasMoreTemplates.value
+              : controller.hasMoreTasks.value;
+
+          if (tasks.isEmpty && !isLoading) {
+            return Center(
+              heightFactor: 10.0,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    SizedBox(height: context.height * 0.2),
+                    CustomTextWidget(
+                      text: isTemplate
+                          ? 'No Templates Available'
+                          : 'No Submitted Tasks Available',
+                    ),
+                    SizedBox(height: context.height * 0.5),
+                  ],
+                ),
+              ),
+            );
+          }
+
           return ListView.builder(
             controller: isTemplate
                 ? controller.templatesScrollController
                 : controller.reportsScrollController,
             shrinkWrap: true,
             physics: const AlwaysScrollableScrollPhysics(),
-            itemCount: tasks.length +
-                (isTemplate
-                    ? (controller.isTemplatesAreLoading.value ? 1 : 0)
-                    : (controller.isTasksAreLoading.value ? 1 : 0)),
+            itemCount: tasks.length + (isLoading && hasMore ? 1 : 0),
             itemBuilder: (context, index) {
               if (index < tasks.length) {
                 final task = tasks[index];
@@ -307,14 +304,12 @@ class TaskListView extends StatelessWidget {
                                 controller: controller,
                                 universalController: universalController,
                               )
-                            : Get.to(
-                                () => CustomTaskScreen(
+                            : Get.to(() => CustomTaskScreen(
                                   reportName: task.name,
                                   task: task,
                                   isTemplate: task.isTemplate,
                                   isDefault: task.isDefault,
-                                ),
-                              );
+                                ));
                       },
                       trailing: task.isDefault
                           ? null
@@ -372,20 +367,18 @@ class TaskListView extends StatelessWidget {
                     ),
                   ),
                 );
-              } else if (isTemplate
-                  ? controller.isTemplatesAreLoading.value
-                  : controller.isTasksAreLoading.value) {
+              } else if (isLoading) {
                 return const Center(
                   heightFactor: 3,
                   child: SpinKitCircle(color: Colors.black87, size: 40.0),
                 );
               } else {
-                return Container();
+                return Container(); // Empty container when no more data to load
               }
             },
           );
-        }
-      }),
+        },
+      ),
     );
   }
 }

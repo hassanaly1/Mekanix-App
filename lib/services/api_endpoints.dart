@@ -15,6 +15,8 @@ class ApiEndPoints {
   static String changePasswordInAppUrl =
       '/api/auth/change-password-by-logged-in-user';
   static String logoutUrl = '/api/auth/userLogout';
+  static String deleteAccountUrl = '/api/auth/send-otp-account-deletion';
+  static String deleteAccountOtpUrl = '/api/auth/verify-otp-account-deletion';
 
   //Custom-Task
   static String createCustomTaskUrl = '/api/formbuilder/save-custom-form';

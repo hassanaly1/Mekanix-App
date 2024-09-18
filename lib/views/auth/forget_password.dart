@@ -1,15 +1,29 @@
-import 'package:flutter/material.dart';
 import 'package:app/controllers/auth_controllers.dart';
 import 'package:app/helpers/appcolors.dart';
 import 'package:app/helpers/custom_button.dart';
 import 'package:app/helpers/custom_text.dart';
 import 'package:app/helpers/reusable_textfield.dart';
+import 'package:app/helpers/validator.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class ForgetPasswordScreen extends StatelessWidget {
-  ForgetPasswordScreen({super.key});
+class ForgetPasswordScreen extends StatefulWidget {
+  const ForgetPasswordScreen({super.key});
 
+  @override
+  State<ForgetPasswordScreen> createState() => _ForgetPasswordScreenState();
+}
+
+class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
   final AuthController controller = Get.find();
+
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    controller.isLoading.value = false;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,55 +89,58 @@ class ForgetPasswordScreen extends StatelessWidget {
                                   ? context.width * 0.2
                                   : context.width * 0.1),
                           child: SingleChildScrollView(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                SizedBox(height: context.height * 0.2),
-                                const CustomTextWidget(
-                                  text: 'Reset your password',
-                                  fontSize: 16.0,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                                const CustomTextWidget(
-                                  text:
-                                      'Enter email address to reset your password',
-                                  fontSize: 12.0,
-                                  fontWeight: FontWeight.w500,
-                                  textAlign: TextAlign.center,
-                                  fontStyle: FontStyle.italic,
-                                  maxLines: 4,
-                                ),
-                                Form(
-                                  child: Column(
+                            child: Form(
+                              key: _formKey,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SizedBox(height: context.height * 0.2),
+                                  const CustomTextWidget(
+                                    text: 'Reset your password',
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  const CustomTextWidget(
+                                    text:
+                                        'Enter email address to reset your password',
+                                    fontSize: 12.0,
+                                    fontWeight: FontWeight.w500,
+                                    textAlign: TextAlign.center,
+                                    fontStyle: FontStyle.italic,
+                                    maxLines: 4,
+                                  ),
+                                  Column(
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
                                       SizedBox(height: context.height * 0.03),
                                       ReUsableTextField(
-                                          controller:
-                                              controller.emailController,
-                                          hintText: 'Email',
-                                          prefixIcon: Icon(
-                                            Icons.email_outlined,
-                                            color: AppColors.primaryColor,
-                                          )
-                                          // validator: (val) =>
-                                          //     AppValidator.validateEmail(value: val),
-                                          ),
+                                        controller: controller.emailController,
+                                        hintText: 'Email',
+                                        prefixIcon: Icon(
+                                          Icons.email_outlined,
+                                          color: AppColors.primaryColor,
+                                        ),
+                                        validator: (val) =>
+                                            AppValidator.validateEmail(
+                                                value: val),
+                                      ),
                                     ],
                                   ),
-                                ),
-                                SizedBox(height: context.height * 0.03),
-                                Obx(
-                                  () => CustomButton(
-                                    isLoading: controller.isLoading.value,
-                                    buttonText: 'Reset Password',
-                                    onTap: () {
-                                      controller.sendOtp(
-                                          verifyOtpForForgetPassword: true);
-                                    },
+                                  SizedBox(height: context.height * 0.03),
+                                  Obx(
+                                    () => CustomButton(
+                                      isLoading: controller.isLoading.value,
+                                      buttonText: 'Reset Password',
+                                      onTap: () {
+                                        if (_formKey.currentState!.validate()) {
+                                          controller.sendOtp(
+                                              verifyOtpForForgetPassword: true);
+                                        }
+                                      },
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ),

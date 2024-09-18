@@ -1,11 +1,11 @@
 import 'dart:typed_data';
 
-import 'package:flutter/material.dart';
 import 'package:app/controllers/universal_controller.dart';
 import 'package:app/helpers/storage_helper.dart';
 import 'package:app/helpers/toast.dart';
 import 'package:app/models/engine_model.dart';
 import 'package:app/services/engine_service.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -163,6 +163,7 @@ class EnginesController extends GetxController {
           subname: engineSubtitle.text.trim(),
           isGenerator: engineType.value == 'Generator',
           isCompressor: engineType.value == 'Compressor',
+          isDefault: false,
         );
         bool success = await engineService.addEngine(
             engineModel: newEngine, engineImageInBytes: engineImageInBytes);
@@ -203,6 +204,7 @@ class EnginesController extends GetxController {
         subname: engineSubtitle.text.trim(),
         isGenerator: engineType.value == 'Generator',
         isCompressor: engineType.value == 'Compressor',
+        isDefault: false,
       );
       bool success = await engineService.updateEngine(
           engineModel: updatedEngineData, token: storage.read('token'));
@@ -237,6 +239,7 @@ class EnginesController extends GetxController {
         subname: engineModel.subname,
         isGenerator: engineModel.isGenerator,
         isCompressor: engineModel.isCompressor,
+        isDefault: false,
       );
       bool success = await engineService.deleteEngine(
         engineModel: deletedEngineData,

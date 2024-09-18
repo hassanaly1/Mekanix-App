@@ -1,9 +1,8 @@
-import 'package:easy_sidemenu/easy_sidemenu.dart';
-import 'package:flutter/material.dart';
 import 'package:app/controllers/universal_controller.dart';
 import 'package:app/helpers/appcolors.dart';
 import 'package:app/helpers/custom_button.dart';
 import 'package:app/helpers/custom_text.dart';
+import 'package:app/helpers/reusable_container.dart';
 import 'package:app/helpers/reusable_textfield.dart';
 import 'package:app/helpers/storage_helper.dart';
 import 'package:app/helpers/tabbar.dart';
@@ -12,6 +11,10 @@ import 'package:app/helpers/validator.dart';
 import 'package:app/services/auth_service.dart';
 import 'package:app/views/auth/login.dart';
 import 'package:app/views/task/widgets/heading_and_textfield.dart';
+import 'package:easy_sidemenu/easy_sidemenu.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -183,17 +186,6 @@ class _ProfileSectionState extends State<ProfileSection> {
                       textColor: Colors.black87,
                     ),
                   ),
-                  // Obx(
-                  //   () => CustomButton(
-                  //     isLoading: isLoading.value,
-                  //     buttonText: 'Update',
-                  //     onTap: () {
-                  //       updateProfileInfo();
-                  //     },
-                  //     usePrimaryColor: true,
-                  //     textColor: Colors.black87,
-                  //   ),
-                  // ),
                   Obx(
                     () => CustomButton(
                       isLoading: isLogoutLoading.value,
@@ -227,6 +219,28 @@ class _ProfileSectionState extends State<ProfileSection> {
                         }
                       },
                       textColor: Colors.white60,
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      showModalBottomSheet(
+                        backgroundColor: Colors.transparent,
+                        context: context,
+                        useSafeArea: true,
+                        isScrollControlled: true,
+                        showDragHandle: true,
+                        sheetAnimationStyle:
+                            AnimationStyle(curve: Curves.easeInOut),
+                        builder: (BuildContext context) {
+                          return const DeleteAccountSheet();
+                        },
+                      );
+                    },
+                    child: const CustomTextWidget(
+                      text: 'Delete Account',
+                      textColor: Colors.redAccent,
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.w600,
                     ),
                   )
                 ],
@@ -424,6 +438,243 @@ class _ProfileSectionState extends State<ProfileSection> {
       debugPrint('Error occurred: $e');
       ToastMessage.showToastMessage(
           message: 'An error occurred: $e', backgroundColor: Colors.red);
+    }
+  }
+}
+
+class DeleteAccountSheet extends StatefulWidget {
+  const DeleteAccountSheet({super.key});
+
+  @override
+  State<DeleteAccountSheet> createState() => _DeleteAccountSheetState();
+}
+
+class _DeleteAccountSheetState extends State<DeleteAccountSheet> {
+  final AuthService _authService = AuthService();
+  final GlobalKey<FormState> deletionFormKey = GlobalKey<FormState>();
+
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  TextEditingController otpController = TextEditingController();
+  var isLoading = false.obs;
+  RxBool showPassword = false.obs;
+  RxBool showOtpTextFields = false.obs;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        width: context.width,
+        height: context.height,
+        decoration: const BoxDecoration(
+          color: Colors.red,
+          gradient: LinearGradient(
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+            colors: [
+              Color.fromRGBO(255, 220, 105, 0.4),
+              Color.fromRGBO(86, 127, 255, 0.4),
+            ],
+          ),
+        ),
+        child: GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: context.width * 0.05),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  IconButton(
+                      onPressed: () => Get.back(),
+                      icon: const Icon(
+                        Icons.expand_circle_down,
+                        size: 30,
+                      )),
+                  const CustomTextWidget(
+                    text: 'Delete Account',
+                    textColor: Colors.red,
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  const SizedBox(height: 20.0),
+                  CustomTextWidget(
+                    text:
+                        'Enter your email & password so that we can verify your identity.',
+                    textColor: AppColors.secondaryColor,
+                    textAlign: TextAlign.center,
+                    fontSize: 14.0,
+                    fontWeight: FontWeight.w600,
+                    maxLines: 2,
+                  ),
+                  const SizedBox(height: 20.0),
+                  Form(
+                    key: deletionFormKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        SizedBox(height: context.height * 0.03),
+                        ReUsableTextField(
+                          controller: emailController,
+                          hintText: 'Email',
+                          keyboardType: TextInputType.emailAddress,
+                          prefixIcon: Icon(
+                            Icons.email_outlined,
+                            color: AppColors.primaryColor,
+                          ),
+                          validator: (val) =>
+                              AppValidator.validateEmail(value: val),
+                        ),
+                        Obx(
+                          () => ReUsableTextField(
+                            controller: passwordController,
+                            hintText: 'Password',
+                            prefixIcon: Icon(
+                              Icons.lock_open_rounded,
+                              color: AppColors.primaryColor,
+                            ),
+                            obscureText: showPassword.value,
+                            suffixIcon: IconButton(
+                              onPressed: () =>
+                                  showPassword.value = !showPassword.value,
+                              icon: Icon(
+                                showPassword.value
+                                    ? CupertinoIcons.eye_slash
+                                    : CupertinoIcons.eye,
+                                color: AppColors.primaryColor,
+                              ),
+                            ),
+                            validator: (val) => AppValidator.validateEmptyText(
+                              value: val,
+                              fieldName: 'Password',
+                            ),
+                          ),
+                        ),
+                        Obx(
+                          () => Visibility(
+                            visible: showOtpTextFields.value,
+                            child: ReUsableTextField(
+                              controller: otpController,
+                              hintText: 'Enter Otp',
+                              keyboardType: TextInputType.number,
+                              prefixIcon: Icon(
+                                Icons.password_outlined,
+                                color: AppColors.primaryColor,
+                              ),
+                              validator: (val) =>
+                                  AppValidator.validateEmptyText(
+                                      value: val, fieldName: 'OTP'),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: context.height * 0.01),
+                  Obx(() => InkWell(
+                      onTap: () {
+                        FocusManager.instance.primaryFocus?.unfocus();
+                        if (deletionFormKey.currentState!.validate()) {
+                          if (showOtpTextFields.value) {
+                            isLoading.value = true;
+                            deleteAccountOtpVerification(context);
+                          } else {
+                            isLoading.value = true;
+                            deleteAccount(context);
+                          }
+                        }
+                      },
+                      child: ReUsableContainer(
+                        width: context.width,
+                        verticalPadding: context.height * 0.01,
+                        height: 50,
+                        color: showOtpTextFields.value
+                            ? AppColors.primaryColor
+                            : Colors.red,
+                        child: Center(
+                            child: isLoading.value
+                                ? Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: SpinKitRing(
+                                      lineWidth: 2.0,
+                                      color: showOtpTextFields.value
+                                          ? Colors.black87
+                                          : Colors.white,
+                                    ),
+                                  )
+                                : CustomTextWidget(
+                                    text: showOtpTextFields.value
+                                        ? 'Verify Otp'
+                                        : 'Delete Account',
+                                    fontSize: 14,
+                                    textColor: showOtpTextFields.value
+                                        ? AppColors.secondaryColor
+                                        : Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                    textAlign: TextAlign.center,
+                                  )),
+                      ))),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  deleteAccount(BuildContext context) async {
+    try {
+      isLoading.value = true;
+      bool isSuccess = await _authService.deleteAccount(
+        email: emailController.text,
+        password: passwordController.text,
+      );
+
+      if (isSuccess) {
+        ToastMessage.showToastMessage(
+          message: 'We have sent you an otp on your email, please verify',
+          backgroundColor: Colors.green,
+        );
+        showOtpTextFields.value = true;
+      }
+    } catch (e) {
+      // Handle any errors that occur during the execution of the function
+      debugPrint('Error occurred: $e');
+      isLoading.value = false;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  deleteAccountOtpVerification(BuildContext context) async {
+    try {
+      isLoading.value = true;
+      Map<String, dynamic> isSuccess =
+          await _authService.deleteAccountVerifyOtp(
+        email: emailController.text,
+        otp: otpController.text,
+      );
+
+      if (isSuccess['status'] == 'Success') {
+        ToastMessage.showToastMessage(
+          message: 'Account deleted Successfully',
+          backgroundColor: Colors.green,
+        );
+        Get.offAll(() => const LoginScreen());
+        storage.remove('token');
+        storage.remove('user_info');
+      } else {
+        ToastMessage.showToastMessage(
+          message: isSuccess['message'],
+          backgroundColor: Colors.red,
+        );
+      }
+    } catch (e) {
+      // Handle any errors that occur during the execution of the function
+      debugPrint('Error occurred: $e');
+      isLoading.value = false;
+    } finally {
+      isLoading.value = false;
     }
   }
 }

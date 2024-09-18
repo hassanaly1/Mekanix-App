@@ -1,5 +1,3 @@
-import 'package:easy_sidemenu/easy_sidemenu.dart';
-import 'package:flutter/material.dart';
 import 'package:app/controllers/dashboard_controller.dart';
 import 'package:app/controllers/universal_controller.dart';
 import 'package:app/helpers/custom_text.dart';
@@ -10,6 +8,8 @@ import 'package:app/services/auth_service.dart';
 import 'package:app/views/auth/login.dart';
 import 'package:app/views/dashboard/right_side.dart';
 import 'package:app/views/dashboard/side_menu.dart';
+import 'package:easy_sidemenu/easy_sidemenu.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -32,7 +32,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     debugPrint('DashboardScreenOnInitCalled');
     controller.tabController = TabController(
       initialIndex: 0,
-      length: 5,
+      length: 6,
       vsync: this,
     );
   }

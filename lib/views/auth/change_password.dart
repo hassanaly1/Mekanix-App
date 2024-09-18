@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:app/controllers/auth_controllers.dart';
 import 'package:app/helpers/appcolors.dart';
 import 'package:app/helpers/custom_button.dart';
@@ -6,12 +5,25 @@ import 'package:app/helpers/custom_text.dart';
 import 'package:app/helpers/reusable_textfield.dart';
 import 'package:app/helpers/toast.dart';
 import 'package:app/helpers/validator.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class ChangePasswordScreen extends StatelessWidget {
-  ChangePasswordScreen({super.key});
+class ChangePasswordScreen extends StatefulWidget {
+  const ChangePasswordScreen({super.key});
 
+  @override
+  State<ChangePasswordScreen> createState() => _ChangePasswordScreenState();
+}
+
+class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   final AuthController controller = Get.find();
+  final GlobalKey<FormState> _changePasswordFormKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    controller.isLoading.value = false;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +107,7 @@ class ChangePasswordScreen extends StatelessWidget {
                                   maxLines: 4,
                                 ),
                                 Form(
-                                  key: controller.changePasswordFormKey,
+                                  key: _changePasswordFormKey,
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
@@ -133,8 +145,7 @@ class ChangePasswordScreen extends StatelessWidget {
                                     isLoading: controller.isLoading.value,
                                     buttonText: 'Change Password',
                                     onTap: () {
-                                      if (controller
-                                          .changePasswordFormKey.currentState!
+                                      if (_changePasswordFormKey.currentState!
                                           .validate()) {
                                         if (controller.passwordController.text
                                                 .trim() !=

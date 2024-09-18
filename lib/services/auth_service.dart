@@ -1,11 +1,12 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:flutter/material.dart';
 import 'package:app/controllers/universal_controller.dart';
 import 'package:app/helpers/storage_helper.dart';
 import 'package:app/services/api_endpoints.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
@@ -47,6 +48,17 @@ class AuthService {
           'code': response.statusCode,
         };
       }
+    } on SocketException {
+      return {
+        'status': 'error',
+        'message':
+            'No Internet connection. Please check your network settings.',
+      };
+    } on TimeoutException {
+      return {
+        'status': 'error',
+        'message': 'The request timed out. Please try again later.',
+      };
     } catch (e) {
       return {
         'status': 'error',
@@ -89,6 +101,17 @@ class AuthService {
           'code': response.statusCode,
         };
       }
+    } on SocketException {
+      return {
+        'status': 'error',
+        'message':
+            'No Internet connection. Please check your network settings.',
+      };
+    } on TimeoutException {
+      return {
+        'status': 'error',
+        'message': 'The request timed out. Please try again later.',
+      };
     } catch (e) {
       return {
         'status': 'error',
@@ -128,6 +151,17 @@ class AuthService {
           'code': response.statusCode,
         };
       }
+    } on SocketException {
+      return {
+        'status': 'error',
+        'message':
+            'No Internet connection. Please check your network settings.',
+      };
+    } on TimeoutException {
+      return {
+        'status': 'error',
+        'message': 'The request timed out. Please try again later.',
+      };
     } catch (e) {
       return {
         'status': 'error',
@@ -165,6 +199,17 @@ class AuthService {
           'code': response.statusCode,
         };
       }
+    } on SocketException {
+      return {
+        'status': 'error',
+        'message':
+            'No Internet connection. Please check your network settings.',
+      };
+    } on TimeoutException {
+      return {
+        'status': 'error',
+        'message': 'The request timed out. Please try again later.',
+      };
     } catch (e) {
       return {
         'status': 'error',
@@ -207,6 +252,17 @@ class AuthService {
           'code': response.statusCode,
         };
       }
+    } on SocketException {
+      return {
+        'status': 'error',
+        'message':
+            'No Internet connection. Please check your network settings.',
+      };
+    } on TimeoutException {
+      return {
+        'status': 'error',
+        'message': 'The request timed out. Please try again later.',
+      };
     } catch (e) {
       return {
         'status': 'error',
@@ -254,6 +310,17 @@ class AuthService {
           'code': response.statusCode,
         };
       }
+    } on SocketException {
+      return {
+        'status': 'error',
+        'message':
+            'No Internet connection. Please check your network settings.',
+      };
+    } on TimeoutException {
+      return {
+        'status': 'error',
+        'message': 'The request timed out. Please try again later.',
+      };
     } catch (e) {
       return {
         'status': 'error',
@@ -454,26 +521,85 @@ class AuthService {
     return UpdateUserImageResult(isSuccess: isSuccess, userData: userData);
   }
 
-  Future<bool> postAuthStateChange() async {
-    var url = Uri.parse(
-        'https://mechanixapi-production.up.railway.app/api/auth/onauthstatechange');
-    var token = storage.read('token');
-    var headers = {
-      'Authorization': 'Bearer $token',
-      'Content-Type': 'application/json',
+  // Future<bool> postAuthStateChange() async {
+  //   var url = Uri.parse(
+  //       'https://mechanixapi-production.up.railway.app/api/auth/onauthstatechange');
+  //   var token = storage.read('token');
+  //   var headers = {
+  //     'Authorization': 'Bearer $token',
+  //     'Content-Type': 'application/json',
+  //   };
+  //
+  //   var response = await http.post(
+  //     url,
+  //     headers: headers,
+  //   );
+  //
+  //   if (response.statusCode == 200) {
+  //     print(response.body);
+  //     return true;
+  //   } else {
+  //     print(response.reasonPhrase);
+  //     return false;
+  //   }
+  // }
+
+  Future<bool> deleteAccount(
+      {required String email, required String password}) async {
+    Map<String, String> data = {
+      'email': email,
+      'password': password,
     };
-
     var response = await http.post(
-      url,
-      headers: headers,
-    );
-
+        Uri.parse('${ApiEndPoints.baseUrl}${ApiEndPoints.deleteAccountUrl}'),
+        body: jsonEncode(data),
+        headers: {
+          'Authorization': 'Bearer ${storage.read('token')}',
+          'Content-Type': 'application/json',
+        });
     if (response.statusCode == 200) {
       print(response.body);
       return true;
     } else {
       print(response.reasonPhrase);
       return false;
+    }
+  }
+
+  Future<Map<String, dynamic>> deleteAccountVerifyOtp({
+    required String email,
+    required String otp,
+  }) async {
+    Map<String, String> data = {
+      'email': email,
+      'otp': otp,
+    };
+
+    var response = await http.post(
+      Uri.parse('${ApiEndPoints.baseUrl}${ApiEndPoints.deleteAccountOtpUrl}'),
+      body: jsonEncode(data),
+      headers: {
+        'Authorization': 'Bearer ${storage.read('token')}',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    print(response.body);
+
+    if (response.statusCode == 200) {
+      // Parse the response body
+      var responseBody = jsonDecode(response.body);
+
+      // Check the status field or message to determine if OTP is valid
+      if (responseBody['status'] == 'failed' &&
+          responseBody['message'] == 'Invalid OTP') {
+        return responseBody;
+      } else {
+        return responseBody;
+      }
+    } else {
+      print(response.reasonPhrase);
+      return {'status': 'failed', 'message': 'Invalid OTP'};
     }
   }
 }

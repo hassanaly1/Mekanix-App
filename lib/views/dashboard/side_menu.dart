@@ -1,9 +1,9 @@
-import 'package:easy_sidemenu/easy_sidemenu.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:app/controllers/universal_controller.dart';
 import 'package:app/helpers/appcolors.dart';
 import 'package:app/helpers/reusable_container.dart';
+import 'package:easy_sidemenu/easy_sidemenu.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 
@@ -116,6 +116,14 @@ class SideMenuCard extends StatelessWidget {
       _buildSideMenuItem(
         title: 'Profile',
         icon: CupertinoIcons.person_fill,
+        onTap: (index, _) {
+          sideMenu.changePage(index);
+          scaffoldKey.currentState?.closeDrawer();
+        },
+      ),
+      _buildSideMenuItem(
+        title: 'Terms & Conditions',
+        icon: CupertinoIcons.doc_text_fill,
         onTap: (index, _) {
           sideMenu.changePage(index);
           scaffoldKey.currentState?.closeDrawer();

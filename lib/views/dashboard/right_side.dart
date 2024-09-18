@@ -1,9 +1,10 @@
-import 'package:easy_sidemenu/easy_sidemenu.dart';
-import 'package:flutter/material.dart';
+import 'package:app/views/dashboard/terms_and_conditions.dart';
 import 'package:app/views/engines/engine.dart';
 import 'package:app/views/home/home.dart';
 import 'package:app/views/profile.dart';
 import 'package:app/views/task/task.dart';
+import 'package:easy_sidemenu/easy_sidemenu.dart';
+import 'package:flutter/material.dart';
 
 class RightSideWidget extends StatelessWidget {
   const RightSideWidget({
@@ -29,6 +30,7 @@ class RightSideWidget extends StatelessWidget {
           EnginesScreen(sideMenu: sideMenu),
           Container(),
           ProfileSection(sideMenu: sideMenu),
+          TermsAndConditionsScreen(sideMenu: sideMenu),
         ],
       ),
     );

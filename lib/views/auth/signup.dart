@@ -1,5 +1,3 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:app/controllers/auth_controllers.dart';
 import 'package:app/helpers/appcolors.dart';
 import 'package:app/helpers/custom_button.dart';
@@ -8,12 +6,26 @@ import 'package:app/helpers/reusable_textfield.dart';
 import 'package:app/helpers/toast.dart';
 import 'package:app/helpers/validator.dart';
 import 'package:app/views/auth/login.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class SignupScreen extends StatelessWidget {
-  SignupScreen({super.key});
+class SignupScreen extends StatefulWidget {
+  const SignupScreen({super.key});
 
+  @override
+  State<SignupScreen> createState() => _SignupScreenState();
+}
+
+class _SignupScreenState extends State<SignupScreen> {
   final AuthController controller = Get.find();
+  final GlobalKey<FormState> _signupFormKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    controller.isLoading.value = false;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +109,7 @@ class SignupScreen extends StatelessWidget {
                                   maxLines: 4,
                                 ),
                                 Form(
-                                  key: controller.signupFormKey,
+                                  key: _signupFormKey,
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
@@ -204,14 +216,18 @@ class SignupScreen extends StatelessWidget {
                                     isLoading: controller.isLoading.value,
                                     buttonText: 'Register',
                                     onTap: () {
-                                      if (controller.passwordController.text ==
-                                          controller
-                                              .confirmPasswordController.text) {
+                                      if (_signupFormKey.currentState!
+                                          .validate()) {
                                         controller.registerUser();
-                                      } else {
-                                        ToastMessage.showToastMessage(
-                                            message: 'Passwords do not match',
-                                            backgroundColor: Colors.red);
+                                        if (controller
+                                                .passwordController.text ==
+                                            controller.confirmPasswordController
+                                                .text) {
+                                        } else {
+                                          ToastMessage.showToastMessage(
+                                              message: 'Passwords do not match',
+                                              backgroundColor: Colors.red);
+                                        }
                                       }
                                     },
                                   ),
@@ -220,6 +236,7 @@ class SignupScreen extends StatelessWidget {
                                 Center(
                                   child: GestureDetector(
                                     onTap: () {
+                                      controller.isLoading.value = false;
                                       controller.fNameController.clear();
                                       controller.lNameController.clear();
                                       controller.emailController.clear();
