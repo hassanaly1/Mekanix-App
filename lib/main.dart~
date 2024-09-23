@@ -63,7 +63,7 @@ class AuthCheck extends StatelessWidget {
         } else {
           if (storage.read('isFirstTime') == true) {
             return const OnBoardingScreen();
-          } else if (storage.read('token') != null ||
+          } else if (storage.read('token') != null &&
               authStatusCheckController.isTokenValid.value) {
             print(
                 'IsTokenValid: ${authStatusCheckController.isTokenValid.value}');
